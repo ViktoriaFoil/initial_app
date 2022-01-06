@@ -1,0 +1,63 @@
+---
+- name: k3s
+  hosts: bot
+  become_method: sudo
+  become: yes
+  become_user: root
+
+  tasks:
+
+  - name: copy dir /home/vika/Документы/k3s/chartbot to /home/foilv
+    ansible.builtin.copy:
+      src: "/home/vika/Документы/k3s/chartbot"
+      dest: "/home/foilv"
+
+  - name: Deploy latest version of mariadb chart
+    kubernetes.core.helm:
+      name: test
+      chart_ref: bitnami/mariadb
+      release_namespace: tournaments
+      create_namespace: true
+      kubeconfig: "/home/foilv/.kube/config"
+      values_files:
+        - /home/foilv/chartbot/valuesdb.yml
+
+  - name: Pause for 1 minute to build app 
+    pause:
+      minutes: 1
+
+  - name: Copy sql file to pod
+    kubernetes.core.k8s_cp:
+      kubeconfig: "/home/foilv/.kube/config"
+      namespace: tournaments
+      pod: test-mariadb-0
+      remote_path: "/tmp/db.sql"
+      local_path: "/home/foilv/chartbot/db.sql"
+    ignore_errors: yes
+
+  - name: Copy script to pod
+    kubernetes.core.k8s_cp:
+      kubeconfig: "/home/foilv/.kube/config"
+      namespace: tournaments
+      pod: test-mariadb-0
+      remote_path: "/tmp/script-import" 
+      local_path: "/home/foilv/chartbot/script-import"
+    ignore_errors: yes
+
+  - name: Import sql file in pod mariadb
+    kubernetes.core.k8s_exec:
+      kubeconfig: /home/foilv/.kube/config
+      namespace: tournaments
+      pod: test-mariadb-0
+      command: sh /tmp/script-import
+    register: exec
+
+  - name: Install my helm chart bot
+    kubernetes.core.helm:
+      name: bot
+      chart_ref: "/home/foilv/chartbot/"
+      release_namespace: tournaments
+      kubeconfig: "/home/foilv/.kube/config"
+      values_files:
+        - /home/foilv/chartbot/values.yml
+
