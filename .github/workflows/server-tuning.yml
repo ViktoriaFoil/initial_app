@@ -1,0 +1,29 @@
+name: initial_installation
+
+on:
+  push:
+    tags:
+      - 'v.*.*'
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: install authorized key id_rsa.pub
+        env:
+          DEPLOY_SERVER_KEY: ${{ secrets.DEPLOY_SERVER_KEY }}
+        run: echo $DEPLOY_SERVER_KEY | base64 --decode > key | chmod 0600 key
+
+      - name: run playbook replacing-variables.yml 
+        run: ansible-playbook --extra-vars="@secretbot.yml" --vault-password-file password replacing-variables.yml
+
+      - name: run playbook replacing-variables.yml 
+        env:
+          ANSIBLE_HOST_KEY_CHECKING: False
+        run: ansible-playbook -i inventory.yml --extra-vars "@vars.yml" initial_installation.yml -u foilv
+
+          
