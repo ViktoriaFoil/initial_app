@@ -13,13 +13,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: echo pass
-        env:
-          PASSFORSECRET: ${{ secrets.PASSFORSECRET }}
-        run: $PASSFORSECRET > password
-
       - name: run playbook replacing-variables.yml 
-        run: ansible-playbook --extra-vars="@secretbot.yml" --vault-password-file password replacing-variables.yml
+        env:
+          PASS: ${{ secrets.PASSFORSECRET }}
+        run: ansible-playbook --extra-vars="@secretbot.yml" --vault-password-file $PASS replacing-variables.yml
 
       - name: run playbook replacing-variables.yml 
         env:
