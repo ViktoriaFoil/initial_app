@@ -16,7 +16,7 @@ jobs:
       - name: run playbook replacing-variables.yml 
         env:
           PASS: ${{ secrets.PASSFORSECRET }}
-        run: echo $PASS > password | ansible-playbook --extra-vars="@secretbot.yml" --vault-password-file $PASS replacing-variables.yml
+        run: echo $PASS > password | ansible-playbook --extra-vars="@secretbot.yml" --vault-password-file password replacing-variables.yml
 
       - name: run playbook replacing-variables.yml 
         env:
