@@ -2,5 +2,4 @@ chartbot/script-import
 chartbot/values.yml
 chartbot/valuesdb.yml
 inventory.yml
-password
 vars.yml
