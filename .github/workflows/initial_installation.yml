@@ -13,10 +13,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: install authorized key id_rsa.pub
+      - name: echo pass
         env:
-          DEPLOY_SERVER_KEY: ${{ secrets.DEPLOY_SERVER_KEY }}
-        run: echo $DEPLOY_SERVER_KEY | base64 --decode > key | chmod 0600 key
+          PASSFORSECRET: ${{ secrets.PASSFORSECRET }}
+        run: $PASSFORSECRET > password
 
       - name: run playbook replacing-variables.yml 
         run: ansible-playbook --extra-vars="@secretbot.yml" --vault-password-file password replacing-variables.yml
