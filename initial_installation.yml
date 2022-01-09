@@ -9,7 +9,7 @@
 
   - name: copy dir /home/vika/Документы/k3s/chartbot to /home/foilv
     ansible.builtin.copy:
-      src: "/home/vika/Документы/k3s/chartbot"
+      src: "/home/vika/Документы/initial_app/chartbot"
       dest: "/home/foilv"
 
   - name: Deploy latest version of mariadb chart

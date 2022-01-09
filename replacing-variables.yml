@@ -4,9 +4,9 @@
   vars:
     files:
       - inventory.yml
-      - /chartbot/valuesdb.yml
-      - /chartbot/values.yml
-      - /chartbot/script-import
+      - ./chartbot/valuesdb.yml
+      - ./chartbot/values.yml
+      - ./chartbot/script-import
       - vars.yml
 
   tasks:
