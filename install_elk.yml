@@ -1,0 +1,24 @@
+---
+- name: k3s
+  hosts: bot
+  become_method: sudo
+  become: yes
+  become_user: root
+
+  tasks:
+
+    - name: Add helm repo
+      kubernetes.core.helm_repository:
+        name: bitnami
+        repo_url: https://charts.bitnami.com/bitnami
+
+    - name: install helm chart kibana
+      kubernetes.core.helm:
+        name: kibana
+        chart_ref: bitnami/kibana
+        release_namespace: elastic-system
+        kubeconfig: "/etc/rancher/k3s/k3s.yaml"
+
+    - name: run kibana
+      ansible.builtin.command: helm upgrade --namespace elastic-system kibana bitnami/kibana \
+                                             --set elasticsearch.hosts[0]=elastic-elasticsearch-master.elastic-system.svc.cluster.local,elasticsearch.port=9200

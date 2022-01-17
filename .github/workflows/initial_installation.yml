@@ -28,4 +28,8 @@ jobs:
           ANSIBLE_HOST_KEY_CHECKING: False
         run: ansible-playbook -i inventory.yml --extra-vars "@vars.yml" initial_installation.yml -u foilv
 
+      # - name: run playbook install_elk.yml
+      #   env:
+      #     ANSIBLE_HOST_KEY_CHECKING: False
+      #   run: ansible-playbook -i inventory.yml install_elk.yml -u foilv
           
