@@ -52,6 +52,7 @@
   #     command: sh /tmp/script-import
   #   register: exec
   #   ignore_errors: yes
+  
 
   - name: Install my helm chart bot
     kubernetes.core.helm:
