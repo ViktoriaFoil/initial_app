@@ -3,5 +3,4 @@ chartbot/values.yml
 chartbot/valuesdb.yml
 inventory.yml
 vars.yml
-values.yaml
 metricbeat
