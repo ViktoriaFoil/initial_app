@@ -7,10 +7,52 @@
 
   tasks:
 
-    - name: Add helm repo
-      kubernetes.core.helm_repository:
-        name: bitnami
-        repo_url: https://charts.bitnami.com/bitnami
+    - name: install helm chart elasticsearch
+      kubernetes.core.helm:
+        name: elasticsearch
+        chart_ref: bitnami/elasticsearch
+        release_namespace: elastic-system
+        kubeconfig: "/etc/rancher/k3s/k3s.yaml"
+        create_namespace: true
+
+    - name: Pause for 1 minute to build app 
+      pause:
+        minutes: 1
+
+    - name: copy dir /metricbeat to /home/foilv
+      ansible.builtin.copy:
+        src: "metricbeat"
+        dest: "/home/foilv"
+
+    - name: copy dir /initial_app/values.yaml to /home/foilv
+      ansible.builtin.copy:
+        src: "values.yaml"
+        dest: "/home/foilv"
+
+    - name: Install helm chart metricbeat
+      kubernetes.core.helm:
+        name: metricbeat
+        chart_ref: "/home/foilv/metricbeat/"
+        release_namespace: elastic-system
+        kubeconfig: "/etc/rancher/k3s/k3s.yaml"
+        values_files:
+          - /home/foilv/values.yaml
+
+    - name: Pause for 1 minute to build app 
+      pause:
+        minutes: 1
+
+    - name: copy filebeat-kubernetes.yaml to /home/foilv
+      ansible.builtin.copy:
+        src: "filebeat-kubernetes.yaml"
+        dest: "/home/foilv"
+
+    - name: create filebeat
+      ansible.builtin.command: kubectl create -f /home/foilv/filebeat-kubernetes.yaml
+
+    - name: Pause for 1 minute to build app 
+      pause:
+        minutes: 1
 
     - name: install helm chart kibana
       kubernetes.core.helm:
@@ -20,5 +62,10 @@
         kubeconfig: "/etc/rancher/k3s/k3s.yaml"
 
     - name: run kibana
+      environment: 
+        KUBECONFIG: /etc/rancher/k3s/k3s.yaml
       ansible.builtin.command: helm upgrade --namespace elastic-system kibana bitnami/kibana \
-                                             --set elasticsearch.hosts[0]=elastic-elasticsearch-master.elastic-system.svc.cluster.local,elasticsearch.port=9200
+                                             --set elasticsearch.hosts[0]=elasticsearch-master.elastic-system.svc.cluster.local,elasticsearch.port=9200
+
+
+
